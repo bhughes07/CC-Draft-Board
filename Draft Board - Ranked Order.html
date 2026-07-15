@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Draft Board — Bobcat K Flag Football</title>
+<meta property="og:title" content="Draft Board — Bobcat K Flag Football">
+<meta property="og:description" content="Interactive draft board for Bobcat K Flag Football tryouts and draft day.">
+<meta property="og:image" content="cheatcode-logo.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="cheatcode-logo.png">
+<link rel="icon" type="image/png" href="cheatcode-mark.png">
+<link rel="apple-touch-icon" href="cheatcode-mark.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --turf:#0446f9;
+    --turf-deep:#032da2;
+    --chalk:#ffffff;
+    --line:#e4e8df;
+    --ink:#1a2420;
+    --muted:#6b7a72;
+    --gold:#c9a227;
+    --hot:#c44e3c;
+    --cool:#4a7afb;
+    --ink-black:#0b0d12;
+    --ink-black-2:#12151d;
+    --cut:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--ink-black);
+    color:#e5e7eb;
+    padding:20px 14px 90px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1100px;margin:0 auto;}
+  header{margin-bottom:8px;}
+  .brandHero{
+    padding:34px 10px 22px;margin-bottom:22px;
+    text-align:center;
+    border-bottom:2px solid var(--turf);
+    position:relative;
+  }
+  .brandHero::after{
+    content:'';position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);
+    width:64px;height:2px;background:#fff;
+  }
+  .brandLogoFull{max-width:300px;width:74%;height:auto;margin:0 auto 18px;display:block;}
+  .brandTitle{
+    font-family:'Anton',sans-serif;
+    font-weight:400;
+    font-size:clamp(40px,9vw,68px);
+    line-height:.92;
+    color:#fff;
+    text-transform:uppercase;
+    letter-spacing:.01em;
+    margin:6px 0 8px;
+  }
+  .eyebrow{
+    font-family:'Oswald',sans-serif;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    font-size:11px;
+    color:var(--cool);
+    font-weight:600;
+  }
+  h1{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,5vw,38px);
+    line-height:1.02;
+    color:var(--turf);
+    margin:4px 0 10px;
+    text-transform:uppercase;
+  }
+  .note{
+    font-size:13px;color:#9199a8;line-height:1.5;
+    max-width:620px;margin:0 auto 16px;text-align:center;
+  }
+  .note b{color:#fff;}
+  .bar{
+    display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+    margin-bottom:10px;
+  }
+  button.act{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    font-size:12px;
+    background:var(--turf);
+    color:var(--chalk);
+    border:none;
+    padding:9px 14px;
+    border-radius:0;
+    clip-path:polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+    cursor:pointer;
+    transition:background .15s;
+  }
+  button.act:hover{background:var(--turf-deep);}
+  button.act.ghost{background:transparent;color:var(--turf);border:1.5px solid var(--turf);clip-path:none;}
+  button.act.ghost:hover{background:var(--turf);color:var(--chalk);}
+  button.act.danger{background:transparent;color:var(--hot);border:1.5px solid var(--hot);clip-path:none;}
+  button.act.danger:hover{background:var(--hot);color:#fff;}
+  button.act.small{padding:6px 11px;font-size:11px;}
+
+  .bar2{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:18px;}
+  .legend{font-size:11px;color:var(--muted);display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+  .legend span{display:inline-flex;gap:5px;align-items:center;}
+  .saved-ind{
+    font-family:'Oswald',sans-serif;
+    font-size:12px;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--cool);font-weight:600;
+    opacity:0;transition:opacity .25s;
+    margin-left:auto;
+  }
+  .saved-ind.show{opacity:1;}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+
+  ul#board{list-style:none;}
+  li.card{
+    display:block;
+    background:#fff;
+    border:1px solid var(--line);
+    border-left:4px solid var(--cool);
+    border-radius:0;
+    clip-path:polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%);
+    padding:12px 16px;
+    margin-bottom:8px;
+    cursor:grab;
+    transition:box-shadow .15s, transform .06s, border-color .15s;
+    box-shadow:0 2px 10px rgba(0,0,0,.18);
+  }
+  .top{
+    display:grid;
+    grid-template-columns:44px 1fr auto;
+    align-items:center;
+    gap:14px;
+  }
+  .right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+  li.card:active{cursor:grabbing;}
+  li.card{touch-action:pan-y;}
+  li.card.dragging{
+    opacity:.5;
+    box-shadow:0 12px 28px rgba(20,40,30,.22);
+  }
+  li.card.touchdrag{
+    position:fixed;
+    left:14px;
+    z-index:50;
+    max-width:732px;
+    pointer-events:none;
+    opacity:.96;
+    box-shadow:0 16px 34px rgba(20,40,30,.28);
+    cursor:grabbing;
+    transition:none;
+  }
+  li.ph{
+    list-style:none;
+    margin:0 0 8px;
+    border-radius:3px;
+    background:rgba(201,162,39,.12);
+    border:1.5px dashed var(--gold);
+  }
+  @media (max-width:520px){
+    li.card.touchdrag{left:10px;}
+  }
+  li.card.over{
+    border-top:2px solid var(--gold);
+    transform:translateY(1px);
+  }
+  .rank{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    font-size:22px;
+    color:var(--turf);
+    text-align:center;
+    line-height:1;
+  }
+  .rank small{display:block;font-size:9px;color:var(--muted);font-weight:500;letter-spacing:.1em;margin-top:2px;}
+  .who{min-width:0;}
+  .name{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    font-size:17px;
+    letter-spacing:.01em;
+    line-height:1.1;
+  }
+  .meta{
+    font-size:12px;color:var(--muted);margin-top:3px;
+    display:flex;gap:12px;flex-wrap:wrap;
+  }
+  .meta b{color:var(--ink);font-weight:600;}
+  .meta.drills{margin-top:5px;gap:10px;}
+  .drill{font-size:11px;color:var(--muted);}
+  .drill b{color:var(--turf);font-weight:700;}
+  .drill.muted{font-style:italic;}
+  .right{align-items:flex-end;}
+  .score.total{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    font-size:22px;
+    line-height:1;
+    color:#fff;
+    background:var(--turf);
+    padding:7px 12px 5px;
+    border-radius:3px;
+    min-width:54px;
+    text-align:center;
+  }
+  .score.total span{display:block;font-size:8px;font-weight:600;letter-spacing:.12em;opacity:.85;margin-top:2px;}
+  .score.total.none{background:#cfd6d2;color:#fff;font-size:18px;padding:10px 12px;}
+  .score.total.ns{background:#9aa3a8;color:#fff;font-size:15px;padding:11px 12px;letter-spacing:.04em;}
+  .avoidtag{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+    color:#fff;background:#c0392b;
+    padding:3px 8px;border-radius:3px;text-align:center;white-space:nowrap;
+  }
+  li.card.avoid{background:#fdf3f2;}
+  li.card.avoid .name{color:#a23227;}
+  .looktag{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    font-size:10px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border-radius:3px;
+    text-align:center;
+    white-space:nowrap;
+  }
+  .dash{color:var(--muted);font-weight:400;}
+  li.card.unscored{background:#fbfcfb;border-style:dashed;}
+  li.card.unscored .name{color:var(--muted);}
+  li.divider{
+    list-style:none;
+    margin:18px 0 10px;
+    padding:8px 4px 6px;
+    border-top:2px solid var(--line);
+    display:flex;flex-direction:column;gap:1px;
+  }
+  li.divider span{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);
+  }
+  li.divider small{font-size:11px;color:var(--muted);opacity:.8;}
+  .editbtn{
+    font-family:'Inter',sans-serif;
+    font-size:11px;font-weight:600;
+    color:var(--muted);
+    background:transparent;
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:3px 9px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all .15s;
+  }
+  .editbtn:hover{border-color:var(--turf);color:var(--turf);}
+  .editbtn.has{color:var(--turf);border-color:var(--turf);background:#eef3ef;}
+  .editwrap{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
+  .editgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;}
+  .editgrid.two{grid-template-columns:repeat(2,1fr);}
+  .field{display:flex;flex-direction:column;gap:3px;}
+  .field label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;}
+  .field input[type=text],.field input[type=number],.field select{
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:6px 8px;
+    background:#fafbfa;
+    color:var(--ink);
+    width:100%;
+  }
+  .field input:focus,.field select:focus,.notebox:focus{outline:none;border-color:var(--turf);background:#fff;}
+  .checkrow{display:flex;gap:16px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
+  .checkrow label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;}
+  .checkrow input[type=checkbox]{width:16px;height:16px;accent-color:var(--turf);}
+  .notebox{
+    width:100%;
+    min-height:56px;
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    line-height:1.45;
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:8px 10px;
+    resize:vertical;
+    background:#fafbfa;
+    cursor:text;
+  }
+  .editactions{display:flex;justify-content:flex-end;margin-top:8px;}
+  .flag{font-size:10px;color:var(--hot);margin-top:3px;display:block;font-weight:500;}
+  .cardactions{margin-top:10px;}
+  .draftbtn{
+    width:100%;
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    font-size:12px;
+    background:var(--gold);
+    color:var(--turf-deep);
+    border:none;
+    border-radius:3px;
+    padding:10px;
+    cursor:pointer;
+    transition:background .15s;
+  }
+  .draftbtn:hover{background:var(--turf);color:#fff;}
+  .draftedWrap{margin-top:22px;}
+  .draftedToggle{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:12px;
+    color:var(--muted);
+    background:transparent;
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:8px 14px;
+    cursor:pointer;
+    width:100%;
+    text-align:left;
+  }
+  .draftedToggle:hover{border-color:var(--turf);color:var(--turf);}
+  ul#draftedList{list-style:none;margin-top:8px;}
+  li.draftedRow{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:#f2f3f0;
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:9px 14px;
+    margin-bottom:6px;
+  }
+  li.draftedRow .name{font-size:14px;color:var(--muted);}
+  li.draftedRow .name b{color:var(--ink);}
+  .restorebtn{
+    font-family:'Inter',sans-serif;
+    font-size:11px;font-weight:600;
+    color:var(--turf);
+    background:#eef3ef;
+    border:1px solid var(--turf);
+    border-radius:3px;
+    padding:4px 10px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .restorebtn:hover{background:var(--turf);color:#fff;}
+  .undo-toast{
+    position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+    background:var(--turf-deep);color:#fff;
+    padding:10px 16px;border-radius:6px;
+    font-family:'Inter',sans-serif;font-size:13px;
+    display:flex;align-items:center;gap:14px;
+    box-shadow:0 10px 24px rgba(0,0,0,.35);
+    z-index:200;
+  }
+  .undo-toast button{
+    font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-size:11px;
+    color:var(--gold);background:transparent;border:none;cursor:pointer;padding:0;
+  }
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px;}
+  .modal-box{background:#fff;border-radius:0;clip-path:polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%);padding:20px;max-width:360px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.45);}
+  .modal-title{font-family:'Anton',sans-serif;font-weight:400;font-size:20px;color:var(--turf);text-transform:uppercase;letter-spacing:.02em;margin-bottom:14px;}
+  .teamGrid{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+  .teamBtn{font-family:'Oswald',sans-serif;font-weight:600;letter-spacing:.03em;text-transform:uppercase;font-size:13px;padding:10px 14px;border-radius:3px;border:1.5px solid var(--turf);background:#fff;color:var(--turf);cursor:pointer;text-align:left;}
+  .teamBtn:hover{background:#eef3ef;}
+  .teamBtn.mine{background:var(--turf);color:#fff;}
+  .teamBtn.addnew{border-style:dashed;color:var(--muted);border-color:var(--line);}
+  .teamsRow{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .teamsRow input[type=text]{flex:1;font-family:'Inter',sans-serif;font-size:13px;border:1px solid var(--line);border-radius:3px;padding:6px 8px;}
+  .teamRemove{color:var(--hot);background:transparent;border:none;font-size:16px;cursor:pointer;padding:2px 6px;}
+  .teamAddRow{display:flex;gap:8px;margin:10px 0 14px;}
+  .teamAddRow input{flex:1;font-family:'Inter',sans-serif;font-size:13px;border:1px solid var(--line);border-radius:3px;padding:6px 8px;}
+  .teamTag{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-left:6px;}
+  .myTeamWrap{margin-top:22px;}
+  .myTeamHeader{font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-size:13px;color:var(--turf);margin-bottom:8px;}
+  li.myTeamRow{background:#eef6f0;border:1.5px solid var(--turf);}
+  footer{margin-top:20px;font-size:11px;color:var(--muted);line-height:1.6;}
+  .filebtn{display:none;}
+  @media (max-width:520px){
+    li.card{padding:11px 12px;}
+    .top{grid-template-columns:36px 1fr auto;gap:10px;}
+    .meta{gap:8px;font-size:11px;}
+    .editgrid{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="brandHero">
+    <img src="cheatcode-logo.png" alt="Cheat Code Coaching" class="brandLogoFull">
+    <h1 class="brandTitle">Draft Board</h1>
+  </header>
+  <p class="note">
+    Ranked by total score (Dash + Agility + Catch, max ~12). Players ranked without full scores show <b>NS</b>. A red <b>Avoid</b> tag marks players to steer clear of. Anyone tagged <b>Hat Pick</b> — automatically for not-yet-evaluated players, or manually by setting a card's Coach look to Hat Pick — always sorts to the very bottom, below every ranked player.
+    Tap <b>Edit</b> on any card to update the player's name, scores, tags, or notes — everything saves automatically. Drag a card (press and hold on a phone) to reorder. On draft day, hit <b>Mark Drafted</b> and pick which team got him — your own picks land under <b>My Team</b> below the board, everyone else's land under <b>Drafted elsewhere</b>. Use <b>Teams</b> to rename your team or add other coaches, and <b>Look Tags</b> to rename the 6/23, 7/9, Hat Pick, or No Look categories.
+  </p>
+
+  <div class="bar">
+    <button class="act" id="addPlayer">+ Add player</button>
+    <button class="act ghost" id="sortScore">Sort by score</button>
+    <button class="act ghost" id="copy">Copy order</button>
+    <button class="act ghost" id="manageTeams">Teams</button>
+    <button class="act ghost" id="manageLooks">Look Tags</button>
+    <button class="act ghost" id="exportBtn">Export backup</button>
+    <button class="act ghost" id="importBtn">Import backup</button>
+    <input type="file" id="importFile" class="filebtn" accept="application/json">
+    <button class="act danger" id="reset">Reset to original roster</button>
+  </div>
+  <div class="bar2">
+    <div class="legend" id="legendRow"></div>
+    <span id="status" class="saved-ind"></span>
+  </div>
+
+  <ul id="board"></ul>
+
+  <div class="myTeamWrap">
+    <div class="myTeamHeader" id="myTeamHeader">My Team (0)</div>
+    <ul id="myTeamList"></ul>
+  </div>
+
+  <div class="draftedWrap">
+    <button class="draftedToggle" id="draftedToggle">Drafted elsewhere (0) +</button>
+    <ul id="draftedList" style="display:none"></ul>
+  </div>
+
+  <footer id="footerNote"></footer>
+</div>
+
+<script>
+// ---------- Original roster (used to seed the board the first time, and for "Reset to original roster") ----------
+// Order below matches the coach's finalized ranking. Scores updated: Miles dash 4.5, Tanner dash 4.5,
+// Amir dash 3.5, Preston dash 3 / agility 4 / catch 0. Jack Gilbert, Asher Alise, Bear Barger now Avoid.
+// Hayes Williams and Benji Miller now Hat Pick.
+const DEFAULT_PLAYERS = [
+  {f:"Miles",l:"Underwood",age:5.1,w:37,h:"3' 4\"",look:"6/23",eval:true,d:4.5,a:4.5,c:2,flag:""},
+  {f:"Easton",l:"Carter",age:6.0,w:40,h:"4' 0\"",look:"7/9",eval:true,d:4,a:4.0,c:2,flag:""},
+  {f:"Carson",l:"Flusche",age:5.5,w:44,h:"3' 8\"",look:"7/9",eval:true,d:4,a:3.0,c:2,flag:""},
+  {f:"Graham",l:"Gammon",age:5.7,w:53,h:"3' 11\"",look:"7/9",eval:true,d:4,a:4.0,c:0,flag:""},
+  {f:"Tanner",l:"Ilnicky",age:5.6,w:45,h:"4' 0\"",look:"6/23",eval:true,d:4.5,a:3.0,c:1,flag:""},
+  {f:"Logan",l:"Gilliland",age:5.4,w:50,h:"3' 8\"",look:"6/23",eval:true,d:4,a:3.0,c:1,flag:"close catch"},
+  {f:"Preston",l:"Garmon",age:5.2,w:42,h:"3' 9\"",look:"6/23",eval:true,d:3,a:4,c:0,flag:""},
+  {f:"Nolan",l:"Fayyazi",age:5.2,w:42,h:"4' 0\"",look:"6/23",eval:true,d:3,a:3.0,c:2,flag:""},
+  {f:"Amir",l:"Gad",age:5.7,w:55,h:"3' 8\"",look:"6/23",eval:true,d:3.5,a:2.0,c:1,flag:""},
+  {f:"Karson",l:"Landry",age:4.8,w:42,h:"3' 10\"",look:"6/23",eval:true,d:4,a:1.0,c:1,flag:""},
+  {f:"Cobey",l:"Hines",age:4.8,w:40,h:"3' 5\"",look:"7/9",eval:true,d:3.0,a:2.5,c:0,flag:""},
+  {f:"Clark",l:"Bell",age:5.6,w:50,h:"(missing)",look:"7/9",eval:true,d:3,a:3.0,c:0,flag:"Height missing"},
+  {f:"Eli",l:"Hawthorne",age:5.3,w:56,h:"3' 6\"",look:"6/23",eval:true,d:3,a:2.0,c:0,flag:""},
+  {f:"Jack",l:"Gilbert",age:5.9,w:50,h:"3' 9\"",look:"6/23",eval:true,avoid:true,d:2,a:2.0,c:0,flag:""},
+  {f:"Asher",l:"Alise",age:5.1,w:45,h:"3' 5\"",look:"7/9",eval:true,avoid:true,d:2,a:2.5,c:1,flag:""},
+  {f:"Bear",l:"Barger",age:4.8,w:39,h:"3' 5\"",look:"none",eval:true,avoid:true,d:2,a:2.0,c:0,flag:""},
+  {f:"Valor",l:"Richardson",age:5.6,w:44,h:"3' 8\"",look:"6/23",eval:true,avoid:true,c:3,flag:"smart"},
+  {f:"Winn",l:"Hinkle",age:null,w:null,h:"—",look:"none",eval:true,avoid:true,d:1,a:2.0,c:0,flag:"new / avoid"},
+  {f:"Gavin",l:"Barber",age:5.2,w:39,h:"3' 9\"",look:"6/23",eval:true,avoid:true,d:1,a:1.0,c:0,flag:""},
+  {f:"Liam",l:"Featherston",age:4.9,w:35,h:"3' 0\"",look:"6/23",eval:true,avoid:true,d:1,c:1,flag:"4th"},
+  {f:"Hayes",l:"Williams",age:5.5,w:47,h:"3' 9\"",look:"hat",eval:true,flag:""},
+  {f:"Benji",l:"Miller",age:5.3,w:45,h:"3' 8\"",look:"hat",eval:true,d:3,c:0,flag:"tough"},
+  {f:"Silas",l:"Vigil",age:6.1,w:45,h:"3' 0\"",look:"hat",eval:true,d:4.0,a:3.5,c:0,flag:"smart"},
+  {f:"Grayson",l:"Dirr",age:5.9,w:49,h:"3' 7\"",look:"hat",eval:false,flag:""},
+  {f:"Everett",l:"Epperson",age:null,w:null,h:"—",look:"hat",eval:false,flag:"New player"},
+  {f:"Eli",l:"Furbush",age:6.4,w:40,h:"3' 7\"",look:"hat",eval:false,flag:""},
+];
+
+const LOOKS={
+  "6/23":{label:"6/23 Flag",bd:"#2f6db0",bg:"#e1edf8",fg:"#1d4f86"},
+  "7/9": {label:"7/9 Flag", bd:"#d98324",bg:"#fbeede",fg:"#9c5b12"},
+  "hat": {label:"Hat Pick", bd:"#7d5ba6",bg:"#efe7f6",fg:"#553a78"},
+  "none":{label:"No look",  bd:"#9aa3a8",bg:"#eef0f1",fg:"#5b666c"},
+};
+
+const STORE_KEY='bobcatDraftBoardRanked:v1';
+const SETTINGS_KEY=STORE_KEY+':settings';
+const DEFAULT_SETTINGS={
+  teams:['My Team'],
+  lookLabels:{"6/23":"6/23 Flag","7/9":"7/9 Flag","hat":"Hat Pick","none":"No look"}
+};
+
+function loadSettings(){
+  try{
+    const raw=localStorage.getItem(SETTINGS_KEY);
+    if(raw){
+      const parsed=JSON.parse(raw);
+      if(parsed&&Array.isArray(parsed.teams)&&parsed.teams.length){
+        return {...DEFAULT_SETTINGS,...parsed,lookLabels:{...DEFAULT_SETTINGS.lookLabels,...(parsed.lookLabels||{})}};
+      }
+    }
+  }catch(e){}
+  return {teams:[...DEFAULT_SETTINGS.teams],lookLabels:{...DEFAULT_SETTINGS.lookLabels}};
+}
+function saveSettings(){
+  try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }catch(e){}
+}
+let settings=loadSettings();
+function lookLabel(key){
+  return (settings.lookLabels && settings.lookLabels[key]) || (LOOKS[key]&&LOOKS[key].label) || key;
+}
+
+function makeId(f,l,existingIds){
+  let base=(f+'-'+l).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+  let id=base,n=2;
+  while(existingIds.has(id)){ id=base+'-'+n; n++; }
+  existingIds.add(id);
+  return id;
+}
+function seed(list){
+  const ids=new Set();
+  return list.map(p=>({note:'',drafted:false,draftedTeam:null,...p,id:makeId(p.f,p.l,ids)}));
+}
+
+// Any player tagged "hat" (auto for not-yet-evaluated players, or set manually via Coach look)
+// always sorts below every non-hat player. Drafted players are pulled out of the active board
+// entirely and parked at the end of the array.
+function normalize(list){
+  const drafted=list.filter(p=>p.drafted);
+  const active=list.filter(p=>!p.drafted);
+  active.forEach(p=>{ if(!p.eval) p.look='hat'; });
+  const main=active.filter(p=>p.look!=='hat');
+  const hatPicks=active.filter(p=>p.look==='hat');
+  return [...main,...hatPicks,...drafted];
+}
+
+let current=[];
+
+function num(v){ return (v===''||v===null||v===undefined||isNaN(v)) ? null : Number(v); }
+function computeTotal(p){
+  const vals=[p.d,p.a,p.c].map(num).filter(v=>v!==null);
+  if(!vals.length) return null;
+  return vals.reduce((s,v)=>s+v,0);
+}
+
+function loadState(){
+  try{
+    const raw=localStorage.getItem(STORE_KEY);
+    if(raw){
+      const parsed=JSON.parse(raw);
+      if(Array.isArray(parsed)&&parsed.length) return normalize(parsed);
+    }
+  }catch(e){}
+  return normalize(seed(DEFAULT_PLAYERS));
+}
+
+const board=document.getElementById('board');
+const statusEl=document.getElementById('status');
+let saveTimer=null;
+function flashSaved(msg){
+  statusEl.textContent=msg||'Saved';
+  statusEl.classList.add('show');
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>statusEl.classList.remove('show'),1600);
+}
+function save(msg){
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify(current));
+    flashSaved(msg);
+  }catch(e){
+    flashSaved('Save failed — storage full/blocked');
+  }
+}
+
+let openEditId=null;
+let draftedOpen=false;
+
+function render(){
+  board.innerHTML='';
+  const active=current.filter(p=>!p.drafted);
+  let rankCounter=0;
+  active.forEach(p=>{
+    const isHat = p.look==='hat';
+    const li=document.createElement('li');
+    li.className='card'+(p.eval?'':' unscored')+(p.avoid?' avoid':'');
+    li.draggable=true;
+    li.dataset.id=p.id;
+    const t=LOOKS[p.look]||LOOKS.none;
+    if(p.avoid) li.style.borderLeftColor='#c0392b';
+    const hasNote=p.note&&p.note.trim().length;
+
+    if(!isHat) rankCounter++;
+    const rankLabel = !isHat ? `${rankCounter}<small>RK</small>` : `<span class="dash">—</span>`;
+
+    const dv=x=>x===null||x===undefined?'·':x;
+    const tot=computeTotal(p);
+    const hasScores = p.eval && tot!==null;
+    const drills = hasScores
+      ? `<span class="drill">Dash <b>${dv(p.d)}</b></span><span class="drill">Agi <b>${dv(p.a)}</b></span><span class="drill">Catch <b>${dv(p.c)}</b></span>`
+      : (p.eval ? `<span class="drill muted">Ranked — no drill scores yet</span>` : `<span class="drill muted">Not scored yet</span>`);
+    const totalPill = hasScores
+      ? `<div class="score total" title="Total of scored drills">${tot}<span>TOT</span></div>`
+      : (p.eval ? `<div class="score total ns" title="Ranked without drill scores">NS</div>` : `<div class="score total none" title="Not yet evaluated">—</div>`);
+    const avoidTag = p.avoid ? `<div class="avoidtag">Avoid</div>` : '';
+
+    const editOpen = openEditId===p.id;
+
+    li.innerHTML=`
+      <div class="top">
+        <div class="rank">${rankLabel}</div>
+        <div class="who">
+          <div class="name">${p.f} ${p.l}</div>
+          <div class="meta phys">${(p.age==null&&p.w==null)?'<span class="drill muted">No measurables yet</span>':`<span>Age <b>${p.age??'·'}</b></span><span>Wt <b>${p.w??'·'}</b></span><span>Ht <b>${p.h||'·'}</b></span>`}</div>
+          <div class="meta drills">${drills}</div>
+          ${p.flag?`<span class="flag">${p.flag}</span>`:''}
+        </div>
+        <div class="right">
+          ${totalPill}
+          ${avoidTag}
+          <div class="looktag" style="background:${t.bg};color:${t.fg}">${lookLabel(p.look)}</div>
+          <button class="editbtn${hasNote?' has':''}" data-id="${p.id}">${editOpen?'Close':'Edit'}</button>
+        </div>
+      </div>
+      <div class="cardactions">
+        <button class="draftbtn" data-draft="${p.id}">Mark Drafted</button>
+      </div>
+      ${editOpen?editPanel(p):''}
+    `;
+    board.appendChild(li);
+  });
+  bindDrag();
+  bindCardButtons();
+  if(openEditId) bindEditPanel(openEditId);
+  renderDrafted();
+  renderLegend();
+}
+
+function renderLegend(){
+  const legend=document.getElementById('legendRow');
+  if(!legend) return;
+  legend.innerHTML = Object.keys(LOOKS).map(k=>
+    `<span><i class="dot" style="background:${LOOKS[k].bd}"></i>${lookLabel(k)}</span>`
+  ).join('');
+}
+
+function renderDrafted(){
+  const draftedAll=current.filter(p=>p.drafted).sort((a,b)=>(b.draftedAt||0)-(a.draftedAt||0));
+  const myTeamName=settings.teams[0];
+  const mine=draftedAll.filter(p=>p.draftedTeam===myTeamName);
+  const others=draftedAll.filter(p=>p.draftedTeam!==myTeamName);
+
+  const myHeader=document.getElementById('myTeamHeader');
+  const myList=document.getElementById('myTeamList');
+  myHeader.textContent=`${myTeamName} (${mine.length})`;
+  myList.innerHTML = mine.length ? mine.map(p=>{
+    const tot=computeTotal(p);
+    const totStr=tot!==null?` — ${tot} pts`:'';
+    return `<li class="draftedRow myTeamRow"><span class="name"><b>${p.f} ${p.l}</b>${totStr}</span><button class="restorebtn" data-restore="${p.id}">Restore</button></li>`;
+  }).join('') : `<li class="draftedRow" style="opacity:.6"><span class="name">No picks yet</span></li>`;
+  myList.querySelectorAll('[data-restore]').forEach(btn=>{
+    btn.addEventListener('click',()=>restorePlayer(btn.dataset.restore));
+  });
+
+  const toggle=document.getElementById('draftedToggle');
+  const list=document.getElementById('draftedList');
+  toggle.textContent=`Drafted elsewhere (${others.length}) ${draftedOpen?'−':'+'}`;
+  list.style.display=draftedOpen?'block':'none';
+  list.innerHTML=others.map(p=>{
+    const tot=computeTotal(p);
+    const totStr=tot!==null?` — ${tot} pts`:'';
+    return `<li class="draftedRow"><span class="name"><b>${p.f} ${p.l}</b>${totStr}<span class="teamTag">${p.draftedTeam}</span></span><button class="restorebtn" data-restore="${p.id}">Restore</button></li>`;
+  }).join('');
+  list.querySelectorAll('[data-restore]').forEach(btn=>{
+    btn.addEventListener('click',()=>restorePlayer(btn.dataset.restore));
+  });
+}
+
+function editPanel(p){
+  return `
+  <div class="editwrap" data-panel-for="${p.id}">
+    <div class="editgrid two">
+      <div class="field"><label>First name</label><input type="text" data-field="f" data-id="${p.id}" value="${(p.f||'').replace(/"/g,'&quot;')}"></div>
+      <div class="field"><label>Last name</label><input type="text" data-field="l" data-id="${p.id}" value="${(p.l||'').replace(/"/g,'&quot;')}"></div>
+    </div>
+    <div class="editgrid">
+      <div class="field"><label>Dash</label><input type="number" step="0.5" data-field="d" data-id="${p.id}" value="${p.d??''}"></div>
+      <div class="field"><label>Agility</label><input type="number" step="0.5" data-field="a" data-id="${p.id}" value="${p.a??''}"></div>
+      <div class="field"><label>Catch</label><input type="number" step="0.5" data-field="c" data-id="${p.id}" value="${p.c??''}"></div>
+    </div>
+    <div class="editgrid">
+      <div class="field"><label>Age</label><input type="number" step="0.1" data-field="age" data-id="${p.id}" value="${p.age??''}"></div>
+      <div class="field"><label>Weight</label><input type="number" data-field="w" data-id="${p.id}" value="${p.w??''}"></div>
+      <div class="field"><label>Height</label><input type="text" data-field="h" data-id="${p.id}" value="${p.h??''}" placeholder="3' 8&quot;"></div>
+    </div>
+    <div class="editgrid two">
+      <div class="field"><label>Coach look</label>
+        <select data-field="look" data-id="${p.id}">
+          ${Object.keys(LOOKS).map(k=>`<option value="${k}" ${p.look===k?'selected':''}>${lookLabel(k)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Tag / flag note</label><input type="text" data-field="flag" data-id="${p.id}" value="${(p.flag||'').replace(/"/g,'&quot;')}" placeholder="e.g. smart, tough"></div>
+    </div>
+    <div class="checkrow">
+      <label><input type="checkbox" data-field="eval" data-id="${p.id}" ${p.eval?'checked':''}> Evaluated</label>
+      <label><input type="checkbox" data-field="avoid" data-id="${p.id}" ${p.avoid?'checked':''}> Avoid</label>
+    </div>
+    <div class="field">
+      <label>Notes</label>
+      <textarea class="notebox" data-field="note" data-id="${p.id}" placeholder="Add a note about ${p.f}…">${(p.note||'').replace(/</g,'&lt;')}</textarea>
+    </div>
+    <div class="editactions">
+      <button class="act small danger" data-remove="${p.id}">Remove player</button>
+    </div>
+  </div>`;
+}
+
+function findPlayer(id){ return current.find(p=>p.id===id); }
+
+function bindCardButtons(){
+  board.querySelectorAll('.editbtn').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const id=btn.dataset.id;
+      openEditId = (openEditId===id) ? null : id;
+      render();
+    });
+    btn.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+  });
+  board.querySelectorAll('.draftbtn').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      openDraftModal(btn.dataset.draft);
+    });
+    btn.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+  });
+}
+
+function draftPlayer(id,team){
+  const p=findPlayer(id);
+  if(!p) return;
+  p.drafted=true;
+  p.draftedTeam=team||settings.teams[0];
+  p.draftedAt=Date.now();
+  if(openEditId===id) openEditId=null;
+  current=normalize(current);
+  save('Drafted');
+  render();
+  showUndo(p);
+}
+function restorePlayer(id){
+  const p=findPlayer(id);
+  if(!p) return;
+  p.drafted=false;
+  p.draftedAt=null;
+  p.draftedTeam=null;
+  current=normalize(current);
+  save('Restored');
+  render();
+}
+
+function confirmModal(message, confirmLabel, onConfirm){
+  const overlay=document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.innerHTML=`
+    <div class="modal-box">
+      <div class="modal-title">Are you sure?</div>
+      <p class="note" style="margin-bottom:14px;">${message}</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button class="act ghost small" id="confirmCancel">Cancel</button>
+        <button class="act danger small" id="confirmYes">${confirmLabel||'Delete'}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.remove(); });
+  overlay.querySelector('#confirmCancel').addEventListener('click',()=>overlay.remove());
+  overlay.querySelector('#confirmYes').addEventListener('click',()=>{ overlay.remove(); onConfirm(); });
+}
+
+function openDraftModal(id){
+  const p=findPlayer(id);
+  if(!p) return;
+  const overlay=document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.innerHTML=`
+    <div class="modal-box">
+      <div class="modal-title">Draft ${p.f} ${p.l} to…</div>
+      <div class="teamGrid" id="teamGrid"></div>
+      <div class="teamAddRow">
+        <input type="text" id="newTeamOnDraft" placeholder="New team / coach name">
+        <button class="act small" id="addNewTeamBtn">Add &amp; draft</button>
+      </div>
+      <button class="act ghost small" id="draftCancel">Cancel</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  const grid=overlay.querySelector('#teamGrid');
+  function buildGrid(){
+    grid.innerHTML = settings.teams.map((t,i)=>
+      `<button class="teamBtn${i===0?' mine':''}" data-team="${t.replace(/"/g,'&quot;')}">${t}</button>`
+    ).join('');
+    grid.querySelectorAll('.teamBtn[data-team]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        draftPlayer(id, btn.dataset.team);
+        overlay.remove();
+      });
+    });
+  }
+  buildGrid();
+  overlay.querySelector('#addNewTeamBtn').addEventListener('click',()=>{
+    const input=overlay.querySelector('#newTeamOnDraft');
+    const name=input.value.trim();
+    if(!name) return;
+    settings.teams.push(name);
+    saveSettings();
+    draftPlayer(id, name);
+    overlay.remove();
+  });
+  overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.remove(); });
+  overlay.querySelector('#draftCancel').addEventListener('click',()=>overlay.remove());
+}
+
+function openTeamsModal(){
+  const overlay=document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.innerHTML=`
+    <div class="modal-box">
+      <div class="modal-title">Teams</div>
+      <div id="teamsListWrap"></div>
+      <div class="teamAddRow">
+        <input type="text" id="newTeamInput" placeholder="Add coach / team name">
+        <button class="act small" id="addTeamBtn">Add</button>
+      </div>
+      <button class="act ghost small" id="teamsDone">Done</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click',e=>{ if(e.target===overlay){ overlay.remove(); render(); } });
+  overlay.querySelector('#teamsDone').addEventListener('click',()=>{ overlay.remove(); render(); });
+
+  function renderTeamsList(){
+    const wrap=overlay.querySelector('#teamsListWrap');
+    wrap.innerHTML = settings.teams.map((t,i)=>`
+      <div class="teamsRow">
+        <input type="text" data-idx="${i}" value="${t.replace(/"/g,'&quot;')}">
+        ${i===0?'<span class="teamTag">(you)</span>':`<button class="teamRemove" data-idx="${i}">×</button>`}
+      </div>`).join('');
+    wrap.querySelectorAll('input[type=text]').forEach(inp=>{
+      inp.addEventListener('change',()=>{
+        const idx=Number(inp.dataset.idx);
+        settings.teams[idx]=inp.value.trim()||settings.teams[idx];
+        saveSettings();
+      });
+    });
+    wrap.querySelectorAll('.teamRemove').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const idx=Number(btn.dataset.idx);
+        settings.teams.splice(idx,1);
+        saveSettings();
+        renderTeamsList();
+      });
+    });
+  }
+  renderTeamsList();
+
+  overlay.querySelector('#addTeamBtn').addEventListener('click',()=>{
+    const input=overlay.querySelector('#newTeamInput');
+    const name=input.value.trim();
+    if(!name) return;
+    settings.teams.push(name);
+    saveSettings();
+    input.value='';
+    renderTeamsList();
+  });
+}
+
+function openLookTagsModal(){
+  const overlay=document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.innerHTML=`
+    <div class="modal-box">
+      <div class="modal-title">Look Tags</div>
+      <div id="lookTagsWrap"></div>
+      <button class="act ghost small" id="lookTagsDone">Done</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  const wrap=overlay.querySelector('#lookTagsWrap');
+  wrap.innerHTML = Object.keys(LOOKS).map(k=>`
+    <div class="teamsRow">
+      <input type="text" data-key="${k}" value="${lookLabel(k).replace(/"/g,'&quot;')}">
+    </div>`).join('');
+  wrap.querySelectorAll('input[type=text]').forEach(inp=>{
+    inp.addEventListener('change',()=>{
+      const key=inp.dataset.key;
+      settings.lookLabels[key]=inp.value.trim()||DEFAULT_SETTINGS.lookLabels[key];
+      inp.value=settings.lookLabels[key];
+      saveSettings();
+      render();
+    });
+  });
+  const close=()=>{ overlay.remove(); render(); };
+  overlay.addEventListener('click',e=>{ if(e.target===overlay) close(); });
+  overlay.querySelector('#lookTagsDone').addEventListener('click', close);
+}
+
+let undoTimer=null;
+function showUndo(p){
+  const existing=document.getElementById('undoToast');
+  if(existing) existing.remove();
+  const toast=document.createElement('div');
+  toast.id='undoToast';
+  toast.className='undo-toast';
+  toast.innerHTML=`<span>${p.f} ${p.l} drafted to ${p.draftedTeam}</span><button type="button">Undo</button>`;
+  document.body.appendChild(toast);
+  toast.querySelector('button').addEventListener('click',()=>{
+    restorePlayer(p.id);
+    toast.remove();
+    clearTimeout(undoTimer);
+  });
+  clearTimeout(undoTimer);
+  undoTimer=setTimeout(()=>toast.remove(),5000);
+}
+
+function bindEditPanel(id){
+  const panel=board.querySelector(`.editwrap[data-panel-for="${CSS.escape(id)}"]`);
+  if(!panel) return;
+  panel.addEventListener('mousedown',e=>e.stopPropagation());
+  panel.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+
+  panel.querySelectorAll('input[type=number], input[type=text], select').forEach(el=>{
+    el.addEventListener('change',()=>{
+      const p=findPlayer(el.dataset.id);
+      if(!p) return;
+      const field=el.dataset.field;
+      if(el.type==='number'){
+        p[field]= el.value===''? null : Number(el.value);
+      }else{
+        p[field]=el.value;
+      }
+      current=normalize(current);
+      save();
+      render();
+    });
+  });
+  panel.querySelectorAll('input[type=checkbox]').forEach(el=>{
+    el.addEventListener('change',()=>{
+      const p=findPlayer(el.dataset.id);
+      if(!p) return;
+      p[el.dataset.field]=el.checked;
+      if(el.dataset.field==='eval'){
+        if(!p.eval){ p.look='hat'; }
+        else if(p.look==='hat'){ p.look='none'; }
+        current=normalize(current);
+        openEditId=p.id;
+      }
+      save();
+      render();
+    });
+  });
+  const noteBox=panel.querySelector('.notebox');
+  if(noteBox){
+    let noteTimer=null;
+    noteBox.addEventListener('input',()=>{
+      const p=findPlayer(noteBox.dataset.id);
+      if(!p) return;
+      p.note=noteBox.value;
+      clearTimeout(noteTimer);
+      noteTimer=setTimeout(()=>save(),400);
+    });
+  }
+  const removeBtn=panel.querySelector('[data-remove]');
+  if(removeBtn){
+    removeBtn.addEventListener('click',()=>{
+      const id=removeBtn.dataset.remove;
+      const p=findPlayer(id);
+      if(!p) return;
+      confirmModal(`Remove ${p.f} ${p.l} from the board? This can't be undone.`,'Remove',()=>{
+        current=current.filter(x=>x.id!==id);
+        openEditId=null;
+        save('Removed');
+        render();
+      });
+    });
+  }
+}
+
+// ---------- Drag reorder (mouse + touch) ----------
+function bindDrag(){
+  const cards=[...board.querySelectorAll('.card')];
+  let dragEl=null;
+
+  cards.forEach(card=>{
+    card.addEventListener('dragstart',e=>{
+      if(e.target.closest('.editwrap')||e.target.closest('.editbtn')||e.target.closest('.draftbtn')){ e.preventDefault(); return; }
+      dragEl=card;card.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    card.addEventListener('dragend',()=>{
+      card.classList.remove('dragging');
+      cards.forEach(c=>c.classList.remove('over'));
+      commitOrder();
+    });
+    card.addEventListener('dragover',e=>{
+      e.preventDefault();
+      const after=getAfterMouse(board,e.clientY);
+      cards.forEach(c=>c.classList.remove('over'));
+      if(after&&after!==dragEl) after.classList.add('over');
+      if(after==null){board.appendChild(dragEl);}
+      else if(after!==dragEl){board.insertBefore(dragEl,after);}
+    });
+
+    let holdTimer=null, lifted=false, startY=0, startX=0, grabOffset=0, placeholder=null, lastAfter=undefined, scrollLock=null;
+
+    function lift(t,rect){
+      lifted=true;
+      navigator.vibrate&&navigator.vibrate(12);
+      placeholder=document.createElement('li');
+      placeholder.className='ph';
+      placeholder.style.height=rect.height+'px';
+      card.parentNode.insertBefore(placeholder,card);
+      card.classList.add('touchdrag');
+      card.style.width=rect.width+'px';
+      moveCard(t.clientY);
+      scrollLock=document.body.style.overflow;
+      document.body.style.overflow='hidden';
+    }
+    function moveCard(clientY){
+      card.style.top=(clientY-grabOffset)+'px';
+    }
+
+    card.addEventListener('touchstart',e=>{
+      if(lifted) return;
+      if(e.target.closest('.editwrap')||e.target.closest('.editbtn')||e.target.closest('.draftbtn')) return;
+      const t=e.touches[0];
+      startY=t.clientY; startX=t.clientX;
+      const rect=card.getBoundingClientRect();
+      grabOffset=t.clientY-rect.top;
+      lastAfter=undefined;
+      holdTimer=setTimeout(()=>lift(t,rect),200);
+    },{passive:true});
+
+    card.addEventListener('touchmove',e=>{
+      const t=e.touches[0];
+      if(!lifted){
+        if(Math.abs(t.clientY-startY)>10||Math.abs(t.clientX-startX)>10){
+          clearTimeout(holdTimer);
+        }
+        return;
+      }
+      e.preventDefault();
+      moveCard(t.clientY);
+      const after=getAfter(t.clientY);
+      if(after!==lastAfter){
+        lastAfter=after;
+        if(after==null) board.appendChild(placeholder);
+        else board.insertBefore(placeholder,after);
+      }
+    },{passive:false});
+
+    function endTouch(){
+      clearTimeout(holdTimer);
+      if(lifted){
+        card.classList.remove('touchdrag');
+        card.style.top=card.style.left=card.style.width='';
+        if(placeholder){ placeholder.parentNode.insertBefore(card,placeholder); placeholder.remove(); placeholder=null; }
+        if(scrollLock!==null){ document.body.style.overflow=scrollLock; scrollLock=null; }
+        lifted=false;
+        commitOrder();
+      }
+    }
+    card.addEventListener('touchend',endTouch);
+    card.addEventListener('touchcancel',endTouch);
+  });
+}
+function getAfter(y){
+  const els=[...board.querySelectorAll('.card:not(.touchdrag):not(.dragging)')];
+  for(const child of els){
+    const box=child.getBoundingClientRect();
+    if(y < box.top+box.height/2) return child;
+  }
+  return null;
+}
+function getAfterMouse(container,y){
+  const els=[...container.querySelectorAll('.card:not(.dragging)')];
+  return els.reduce((closest,child)=>{
+    const box=child.getBoundingClientRect();
+    const offset=y-box.top-box.height/2;
+    if(offset<0&&offset>closest.offset) return {offset,element:child};
+    return closest;
+  },{offset:-Infinity}).element;
+}
+function commitOrder(){
+  const ids=[...board.querySelectorAll('.card')].map(c=>c.dataset.id);
+  const reorderedActive=ids.map(id=>findPlayer(id)).filter(Boolean);
+  const drafted=current.filter(p=>p.drafted);
+  current=normalize([...reorderedActive,...drafted]);
+  save();
+  render();
+}
+
+// ---------- Toolbar actions ----------
+document.getElementById('addPlayer').onclick=()=>{
+  const ids=new Set(current.map(p=>p.id));
+  const id=makeId('New','Player',ids);
+  const p={id,f:'New',l:'Player',age:null,w:null,h:'',look:'hat',eval:false,avoid:false,d:null,a:null,c:null,flag:'',note:'',drafted:false,draftedTeam:null};
+  current.push(p);
+  current=normalize(current);
+  openEditId=id;
+  save('Added');
+  render();
+  const panel=board.querySelector(`.editwrap[data-panel-for="${CSS.escape(id)}"]`);
+  if(panel){
+    panel.scrollIntoView({behavior:'smooth',block:'center'});
+    const nameInput=panel.querySelector('input[data-field="f"]');
+    if(nameInput){ nameInput.focus(); nameInput.select(); }
+  }
+};
+
+document.getElementById('sortScore').onclick=()=>{
+  current=normalize(current);
+  const drafted=current.filter(p=>p.drafted);
+  const active=current.filter(p=>!p.drafted);
+  const main=active.filter(p=>p.look!=='hat').sort((a,b)=>{
+    const ta=computeTotal(a), tb=computeTotal(b);
+    if(ta===null&&tb===null) return 0;
+    if(ta===null) return 1;
+    if(tb===null) return -1;
+    return tb-ta;
+  });
+  const hatPicks=active.filter(p=>p.look==='hat');
+  current=[...main,...hatPicks,...drafted];
+  save('Sorted');
+  render();
+};
+
+document.getElementById('draftedToggle').addEventListener('click',()=>{
+  draftedOpen=!draftedOpen;
+  renderDrafted();
+});
+
+document.getElementById('reset').onclick=()=>{
+  confirmModal('Reset the board to the original roster? Any edits, notes, drafted status, or added/removed players on this device will be lost.','Reset',()=>{
+    current=normalize(seed(DEFAULT_PLAYERS));
+    openEditId=null;
+    save('Reset');
+    render();
+  });
+};
+
+document.getElementById('copy').onclick=()=>{
+  let rank=0, lines=[], hatDone=false;
+  const active=current.filter(p=>!p.drafted);
+  const drafted=current.filter(p=>p.drafted);
+  active.forEach(p=>{
+    const isHat=p.look==='hat';
+    const n=p.note&&p.note.trim();
+    const noteStr=n?` — ${n.replace(/\s*\n\s*/g,' ')}`:'';
+    if(!isHat){
+      rank++;
+      const tot=computeTotal(p);
+      const totStr = tot!==null ? ` (${tot})` : '';
+      const avoidStr = p.avoid ? ' [AVOID]' : '';
+      lines.push(`${rank}. ${p.f} ${p.l}${totStr}${avoidStr}${noteStr}`);
+    }else{
+      if(!hatDone){ lines.push('', lookLabel('hat')+':'); hatDone=true; }
+      lines.push(`- ${p.f} ${p.l}${noteStr}`);
+    }
+  });
+  if(drafted.length){
+    lines.push('','Drafted:');
+    drafted.forEach(p=>lines.push(`- ${p.f} ${p.l} -> ${p.draftedTeam||'?'}`));
+  }
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>{
+    const b=document.getElementById('copy');const o=b.textContent;
+    b.textContent='Copied';setTimeout(()=>b.textContent=o,1400);
+  });
+};
+
+document.getElementById('manageTeams').addEventListener('click', openTeamsModal);
+document.getElementById('manageLooks').addEventListener('click', openLookTagsModal);
+
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const payload={players:current,settings};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const stamp=new Date().toISOString().slice(0,10);
+  a.href=url;
+  a.download=`bobcat-draft-board-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  flashSaved('Exported');
+});
+
+document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change',e=>{
+  const file=e.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const parsed=JSON.parse(reader.result);
+      const players = Array.isArray(parsed) ? parsed : parsed.players;
+      if(!Array.isArray(players)) throw new Error('bad format');
+      confirmModal(`Import ${players.length} players from this backup? This will replace the board on this device.`,'Import',()=>{
+        current=normalize(players);
+        if(!Array.isArray(parsed) && parsed.settings){
+          settings={...DEFAULT_SETTINGS,...parsed.settings,lookLabels:{...DEFAULT_SETTINGS.lookLabels,...(parsed.settings.lookLabels||{})}};
+          saveSettings();
+        }
+        openEditId=null;
+        save('Imported');
+        render();
+      });
+    }catch(err){
+      confirmModal('Could not read that file — make sure it\'s a backup exported from this board.','OK',()=>{});
+    }
+    e.target.value='';
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('footerNote').innerHTML =
+  `Score = Dash + Agility + Catch (each drill scored roughly 0–4, max ~12). Totals only sum drills a player actually did — a blank drill shows "·". ` +
+  `Everything here — order, notes, scores, drafted status, and team names — saves automatically to this browser/device, but that storage never syncs between devices, even on the same URL. ` +
+  `To get your phone and computer showing the same board, hit <b>Export backup</b> on the device with your latest changes, send yourself the file, then hit <b>Import backup</b> on the other device.`;
+
+// ---------- Init ----------
+current = loadState();
+render();
+</script>
+</body>
+</html>
